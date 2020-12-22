@@ -46,17 +46,38 @@ int zeroIndex(vector<int> arr) {
     return -1;
 }
 
+int arr2num(vector<int> arr) {
+    int res = 0;
+    for (int i = 0; i < 9; ++i) {
+        res = res * 10 + arr[i];
+    }
+    return res;
+}
+
+vector<int> num2arr(int num) {
+    vector<int> res;
+    for (int i = 0; i < 9; ++i) {
+        res.push_back(num % 10);
+        num /= 10;
+    }
+    reverse(res.begin(), res.end());
+
+    return res;
+}
+
 int dd[] = { 1, -1, 3, -3 };
 
 unordered_set<int> st;
 
-bool dfs(vector<int>& arr, int idx, vector<vector<int>>& path) {
+int c = 1;
+bool dfs(int _arr, int idx, vector<int>& path) {
+    vector<int> arr= num2arr(_arr);
     if (!isSolvable(arr, answer) || st.count(arrHash(arr))) return false;
     st.insert(arrHash(arr));
     if (isSolve(arr)) {
         return true;
     }
-        
+    cout << c++ << endl;
     //cout << "!!!!!" << endl;
     for (int i = 0; i < 4; ++i) {
         if (idx % 3 == 0 && i == 1) continue;
@@ -64,8 +85,9 @@ bool dfs(vector<int>& arr, int idx, vector<vector<int>>& path) {
         int next_idx = idx + dd[i];
         if (next_idx >= 0 && next_idx < 9) {
             swap(arr[idx], arr[next_idx]);
-            path.push_back(arr);
-            if (dfs(arr, next_idx, path)) return true;
+            int tmp = arr2num(arr);
+            path.push_back(tmp);
+            if (dfs(tmp, next_idx, path)) return true;
             path.pop_back();
             swap(arr[idx], arr[next_idx]);
         }
@@ -86,11 +108,13 @@ bool dfs(vector<int>& arr, int idx, vector<vector<int>>& path) {
 //}
 
 int main() {
-    vector<int> start { 0,1,2,3,4,5,6,7,8};
-    vector<vector<int>> path;
-    path.push_back(vector<int>(start));
-    bool solved = dfs(start, zeroIndex(start), path);
-    for (vector<int> arr: path) {
+    vector<int> start { 3,6,5,2,0,7,1,4,8 };
+    vector<int> path;
+    int start_ = arr2num(start);
+    path.push_back(start_);
+    bool solved = dfs(start_, zeroIndex(start), path);
+    for (int arr_: path) {
+        vector<int> arr = num2arr(arr_);
         for (int i = 0; i < 9; ++i) {
             if (i % 3 == 0) cout << endl;
             cout << arr[i] << ' ';
