@@ -1,9 +1,11 @@
 #include<iostream>
 #include<unordered_set>
+#include<unordered_map>
 #include<vector>
 #include<queue>
 using namespace std;
 vector<int> answer { 1, 2, 3, 4, 5, 6, 7, 8, 0 };
+int dd[] = { 1, -1, 3, -3 };
 
 int getInvCount(vector<int> arr) {
     int inv_count = 0;
@@ -65,19 +67,78 @@ vector<int> num2arr(int num) {
     return res;
 }
 
-int AScore(vector<int> arr) {
-    int score = 0;
+int manhattan[9][9] = {
+    {0,1,2,1,2,3,2,3,4},
+    {1,0,1,2,1,2,3,2,3},
+    {2,1,0,3,2,1,4,3,2},
+    {1,2,3,0,1,2,1,2,3},
+    {2,1,2,1,0,1,2,1,2},
+    {3,2,1,2,1,0,3,2,1},
+    {2,3,4,1,2,3,0,1,2},
+    {3,2,3,2,1,2,1,0,1},
+    {4,3,2,3,2,1,2,1,0}
+};
+unordered_map<int, int> step;
+
+int AScore(vector<int> arr, int s) {
+    int score = s;
     for (int i = 0; i < 9; ++i) {
-        if (arr[i] == answer[i]) score++;
+        score += manhattan[i][arr[i]];
     }
-    return 0;
+    return score;
 }
 
-//int AStar() {
-//
-//}
 
-int dd[] = { 1, -1, 3, -3 };
+
+
+struct cmp {
+    bool operator()(int a, int b) {
+        int as = AScore(num2arr(a), step[a]);
+        int bs = AScore(num2arr(b), step[b]);
+        //printf("as: %d, bs: %d \n", as, bs);
+        return as > bs;
+    }
+};
+
+int a = 1;
+unordered_map<int, int> Aparent;
+unordered_set<int> visited;
+int AStar(int arr_) {
+    priority_queue<int, vector<int>, cmp> q;
+    q.push(arr_);
+    while (q.size()) {
+        int n = q.size();
+        cout << a++ << endl;
+        while (n--) {
+            int now = q.top();
+            visited.insert(now);
+            //cout << now << endl;
+            if (now == 1234567890) return true;
+            vector<int> arr = num2arr(now);
+            q.pop();
+            int idx = zeroIndex(arr);
+            for (int i = 0; i < 4; ++i) {
+                if (idx % 3 == 0 && i == 1) continue;
+                if (idx % 3 == 2 && i == 0) continue;
+                int next_idx = idx + dd[i];
+                if (next_idx >= 0 && next_idx < 9) {
+                    swap(arr[idx], arr[next_idx]);
+                    int tmp = arr2num(arr);
+                    
+                    if (!visited.count(tmp)) {
+                        Aparent[tmp] = now;
+                        step[tmp] = step[now] + 1;
+                        q.push(tmp);
+                    }
+                    
+                    swap(arr[idx], arr[next_idx]);
+                }
+            }
+        }
+    }
+}
+
+
 
 unordered_set<int> st;
 
@@ -108,35 +169,68 @@ bool dfs(int _arr, int idx, vector<int>& path) {
     return false;
 }
 
-//int bfs(vector<int>& arr, int idx, vector<vector<int>>& path) {
-//    queue<int> q;
-//    q.push(idx);
-//    while (q.size()) {
-//        int n = q.size();
-//        while (n--) {
-//            int idx_ = q.front();
-//
-//        }
-//    }
-//}
+unordered_map<int, int> parent;
+int b = 1;
+bool bfs(int arr_) {
+    queue<int> q;
+    q.push(arr_);
+    while (q.size()) {
+        cout << b++ << endl;
+        int n = q.size();
+        while (n--) {
+            int now = q.front();
+            if (now == 1234567890) return true;
+            vector<int> arr = num2arr(now);
+            q.pop();
+            int idx = zeroIndex(arr);
+            for (int i = 0; i < 4; ++i) {
+                if (idx % 3 == 0 && i == 1) continue;
+                if (idx % 3 == 2 && i == 0) continue;
+                int next_idx = idx + dd[i];
+                if (next_idx >= 0 && next_idx < 9) {
+                    swap(arr[idx], arr[next_idx]);
+                    int tmp = arr2num(arr);
+                    parent[tmp] = now;
+                    q.push(tmp);
+                    swap(arr[idx], arr[next_idx]);
+                }
+            }
+        }
+    }
+    return false;
+}
 
 int main() {
-    vector<int> start { 0,8,4,2,7,3,1,5,6 };
+    vector<int> start { 3,1,2,4,5,6,7,0,8 };
+    vector<int> start2(start);
     vector<int> path;
-    int start_ = arr2num(start);
-    path.push_back(start_);
-    bool solved = dfs(start_, zeroIndex(start), path);
-    for (int arr_: path) {
-        vector<int> arr = num2arr(arr_);
-        for (int i = 0; i < 9; ++i) {
-            if (i % 3 == 0) cout << endl;
-            cout << arr[i] << ' ';
-        }
-        cout << "\n------>\n";
+    //int start_ = arr2num(start);
+    //path.push_back(start_);
+    //bool solved = dfs(start_, zeroIndex(start), path);
+    //for (int arr_: path) {
+    //    vector<int> arr = num2arr(arr_);
+    //    for (int i = 0; i < 9; ++i) {
+    //        if (i % 3 == 0) cout << endl;
+    //        cout << arr[i] << ' ';
+    //    }
+    //    cout << "\n------>\n";
+    //}
+    //cout << "search count:" << c << endl;
+    //cout << "solved: " << solved << endl;
+    //cout << "path count: " << path.size() << endl;
+
+
+
+    cout << "--------bfs:" << path.size() << endl;
+    bool solved2 = false;
+    int start2_ = arr2num(start2);
+    solved2 = AStar(start2_);
+    int now = 123456780;
+    cout << now << endl;
+    while (Aparent[now]) {
+        cout << Aparent[now] << endl;
+        now = Aparent[now];
     }
-    cout << "search count:" << c << endl;
-    cout << "solved: " << solved << endl;
-    cout << "path count: " << path.size() << endl;
     //cout << solved;
 
 	return 0;
