@@ -1,12 +1,13 @@
-#include<iostream>
-#include<unordered_set>
-#include<unordered_map>
-#include<vector>
-#include<queue>
-using namespace std;
-vector<int> answer { 1, 2, 3, 4, 5, 6, 7, 8, 0 };
-int dd[] = { 1, -1, 3, -3 };
+#pragma warning(disable:4996)
+#include "puzzle.h"
+#include "DFS.h"
+#include "BFS.h"
+#include "AStar.h"
+#include <windows.h> 
 
+using namespace std;
+
+//计算逆序数
 int getInvCount(vector<int> arr) {
     int inv_count = 0;
     for (int i = 0; i < 9 - 1; i++)
@@ -17,241 +18,67 @@ int getInvCount(vector<int> arr) {
     return inv_count;
 }
 
-bool isSolvable(vector<int> src, vector<int> tgt) {
+//根据逆序数判断是否有解
+bool isSolvable(vector<int> src) {
     // Count inversions in given 8 puzzle 
     int invSrc = getInvCount(src);
-    int invTgt = getInvCount(tgt);
-
     // return true if inversion count is even. 
-    return (invSrc % 2 == invTgt % 2);
+    return invSrc % 2 == 0;
 }
 
-bool isSolve(vector<int> arr) {
+//洗牌算法，获取随机数组
+vector<int> randomSource() {
+    srand((unsigned)time(NULL));
+    vector<int> res{ 1, 2, 3, 4, 5, 6, 7, 8, 0 };
     for (int i = 0; i < 9; ++i) {
-        if (arr[i] != answer[i]) return false;
-    }
-    return true;
-}
-
-int arrHash(vector<int> arr) {
-    int res = 0;
-    for (int i = 0; i < 9; ++i) {
-        res = res * 10 + arr[i];
+        int j = rand() % (9-i) + i;
+        swap(res[i], res[j]);
     }
     return res;
 }
 
-int zeroIndex(vector<int> arr) {
-    for (int i = 0; i < 9; ++i) {
-        if (arr[i] == 0) return i;
-    }
-    return -1;
+//八数码初始状态
+vector<int> source;
+
+//Astar线程
+DWORD WINAPI f_astar(LPVOID lpParamter) {
+    puzzle* astar = new AStar(source);
+    astar->start();
+    return 0L;
 }
 
-int arr2num(vector<int> arr) {
-    int res = 0;
-    for (int i = 0; i < 9; ++i) {
-        res = res * 10 + arr[i];
-    }
-    return res;
+//DFS线程
+DWORD WINAPI f_dfs(LPVOID lpParamter) {
+    puzzle* dfs = new DFS(source);
+    dfs->start();
+    return 0L;
 }
 
-vector<int> num2arr(int num) {
-    vector<int> res;
-    for (int i = 0; i < 9; ++i) {
-        res.push_back(num % 10);
-        num /= 10;
-    }
-    reverse(res.begin(), res.end());
-
-    return res;
-}
-
-void outArr(vector<int> arr) {
-    for (int i = 0; i < 9; ++i) {
-        if (i % 3 == 0) cout << endl;
-        cout << arr[i] << ' ';
-    }
-    cout << endl << "-----" << endl;
-}
-
-int manhattan[10][10] = {
-    {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-    {-1, 0, 1, 2, 1, 2, 3, 2, 3, 4},
-    {-1, 1, 0, 1, 2, 1, 2, 3, 2, 3},
-    {-1, 2, 1, 0, 3, 2, 1, 4, 3, 2},
-    {-1, 1, 2, 3, 0, 1, 2, 1, 2, 3},
-    {-1, 2, 1, 2, 1, 0, 1, 2, 1, 2},
-    {-1, 3, 2, 1, 2, 1, 0, 3, 2, 1},
-    {-1, 2, 3, 4, 1, 2, 3, 0, 1, 2},
-    {-1, 3, 2, 3, 2, 1, 2, 1, 0, 1},
-    {-1, 4, 3, 2, 3, 2, 1, 2, 1, 0}
-};
-unordered_map<int, int> step;
-
-int AScore(vector<int> arr, int s) {
-    int score = s;
-    for (int i = 0; i < 9; ++i) {
-        score += manhattan[i+1][arr[i]];
-    }
-    return score;
-}
-
-
-
-
-struct cmp {
-    bool operator()(int a, int b) {
-        int as = AScore(num2arr(a), step[a]);
-        int bs = AScore(num2arr(b), step[b]);
-        //printf("as: %d, bs: %d \n", as, bs);
-        return as > bs;
-    }
-};
-
-int a = 1;
-unordered_map<int, int> Aparent;
-unordered_set<int> visited;
-int AStar(int arr_) {
-    priority_queue<int, vector<int>, cmp> q;
-    q.push(arr_);
-    while (q.size()) {
-        int n = q.size();
-        //cout << a++ << endl;
-        while (n--) {
-            int now = q.top();
-            visited.insert(now);
-            cout << a++ << endl;
-            //cout << now << endl;
-            //outArr(num2arr(now));
-            if (now == 123456780) return true;
-            vector<int> arr = num2arr(now);
-            q.pop();
-            int idx = zeroIndex(arr);
-            for (int i = 0; i < 4; ++i) {
-                if (idx % 3 == 0 && i == 1) continue;
-                if (idx % 3 == 2 && i == 0) continue;
-                int next_idx = idx + dd[i];
-                if (next_idx >= 0 && next_idx < 9) {
-                    swap(arr[idx], arr[next_idx]);
-                    int tmp = arr2num(arr);
-                    if (!visited.count(tmp)) {
-                        Aparent[tmp] = now;
-                        step[tmp] = step[now] + 1;
-                        q.push(tmp);
-                    }
-                    
-                    swap(arr[idx], arr[next_idx]);
-                }
-            }
-        }
-    }
-}
-
-
-
-unordered_set<int> st;
-
-int c = 1;
-bool dfs(int _arr, int idx, vector<int>& path) {
-    vector<int> arr= num2arr(_arr);
-    if (!isSolvable(arr, answer) || path.size() >= 50 || st.count(arrHash(arr))) return false;
-    st.insert(arrHash(arr));
-    if (_arr == 123456780) {
-        return true;
-    }
-    c++;
-    //cout << c++ << endl;
-    //cout << "!!!!!" << endl;
-    for (int i = 0; i < 4; ++i) {
-        if (idx % 3 == 0 && i == 1) continue;
-        if (idx % 3 == 2 && i == 0) continue;
-        int next_idx = idx + dd[i];
-        if (next_idx >= 0 && next_idx < 9) {
-            swap(arr[idx], arr[next_idx]);
-            int tmp = arr2num(arr);
-            path.push_back(tmp);
-            if (dfs(tmp, next_idx, path)) return true;
-            path.pop_back();
-            swap(arr[idx], arr[next_idx]);
-        }
-    }
-    return false;
-}
-
-unordered_map<int, int> parent;
-int b = 1;
-bool bfs(int arr_) {
-    queue<int> q;
-    q.push(arr_);
-    while (q.size()) {
-        cout << b++ << endl;
-        int n = q.size();
-        while (n--) {
-            int now = q.front();
-            if (now == 123456780) return true;
-            vector<int> arr = num2arr(now);
-            q.pop();
-            int idx = zeroIndex(arr);
-            for (int i = 0; i < 4; ++i) {
-                if (idx % 3 == 0 && i == 1) continue;
-                if (idx % 3 == 2 && i == 0) continue;
-                int next_idx = idx + dd[i];
-                if (next_idx >= 0 && next_idx < 9) {
-                    swap(arr[idx], arr[next_idx]);
-                    int tmp = arr2num(arr);
-                    parent[tmp] = now;
-                    q.push(tmp);
-                    swap(arr[idx], arr[next_idx]);
-                }
-            }
-        }
-    }
-    return false;
+//BFS线程
+DWORD WINAPI f_bfs(LPVOID lpParamter) {
+    puzzle* bfs = new BFS(source);
+    bfs->start();
+    return 0L;
 }
 
 int main() {
-    vector<int> start { 1,2,3,4,5,6,0,7,8 };
-    vector<int> start2(start);
-    vector<int> path;
-    //int start_ = arr2num(start);
-    //path.push_back(start_);
-    //bool solved = dfs(start_, zeroIndex(start), path);
-    //for (int arr_: path) {
-    //    vector<int> arr = num2arr(arr_);
-    //    for (int i = 0; i < 9; ++i) {
-    //        if (i % 3 == 0) cout << endl;
-    //        cout << arr[i] << ' ';
-    //    }
-    //    cout << "\n------>\n";
-    //}
-    //cout << "search count:" << c << endl;
-    //cout << "solved: " << solved << endl;
-    //cout << "path count: " << path.size() << endl;
+    initgraph(1200, 400);	// 创建绘图窗口
+    
+    //获取有解的八数码
+    do {
+        source = randomSource();
+    } while (!isSolvable(source));
 
-    cout << "--------BFS:" << endl;
-    bool solved2 = false;
-    int start2_ = arr2num(start2);
-    solved2 = bfs(start2_);
-    int now = 123456780;
-    outArr(num2arr(now));
-    while (Aparent[now]) {
-        outArr(num2arr(Aparent[now]));
-        now = Aparent[now];
-    }
+    //启动三个线程
+    HANDLE t_astar = CreateThread(NULL, 0, f_astar, NULL, 0, NULL);
+    HANDLE t_dfs = CreateThread(NULL, 0, f_dfs, NULL, 0, NULL);
+    HANDLE t_bfs = CreateThread(NULL, 0, f_bfs, NULL, 0, NULL);
+    
+    if (t_astar) CloseHandle(t_astar);
+    if (t_dfs) CloseHandle(t_dfs);
+    if (t_bfs) CloseHandle(t_bfs);
 
-
-    //cout << "--------Astar:" << endl;
-    //bool solved2 = false;
-    //int start2_ = arr2num(start2);
-    //solved2 = AStar(start2_);
-    //int now = 123456780;
-    //outArr(num2arr(now));
-    //while (Aparent[now]) {
-    //    outArr(num2arr(Aparent[now]));
-    //    now = Aparent[now];
-    //}
-
+    char ch = _getch();
 
 	return 0;
 }

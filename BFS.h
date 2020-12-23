@@ -13,11 +13,14 @@ private:
             while (n--) {
                 count++;
                 int now = q.front();
+                
+                std::vector<int> arr = num2arr(now);
+                draw(arr, true);
+
                 if (now == ANSNUM) {
                     solved = true;
                     return true;
                 }
-                std::vector<int> arr = num2arr(now);
                 q.pop();
                 int idx = zeroIndex(arr);
                 for (int i = 0; i < 4; ++i) {
@@ -37,6 +40,7 @@ private:
         return false;
     }
 public:
+    BFS(std::vector<int> _state) : puzzle(_state, 1, "BFS") {}
     void run() {
         bfs();
     }

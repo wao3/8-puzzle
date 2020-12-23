@@ -6,12 +6,15 @@
 class DFS : public puzzle
 {
 private:
-	int MAX = 50;
+	int MAX = 50; //最大递归深度
+
     bool dfs(int stateNum, int idx, int d_step) {
         std::vector<int> stateArr = num2arr(stateNum);
-        if (d_step >= 50 || visited.count(stateNum)) return false;
+        draw(stateArr, true);
+
+        if (d_step >= MAX || visited.count(stateNum)) return false;
         visited.insert(stateNum);
-        if (stateNum == 123456780) {
+        if (stateNum == ANSNUM) {
             solved = true;
             return true;
         }
@@ -33,6 +36,7 @@ private:
         return false;
     }
 public:
+    DFS(std::vector<int> _state): puzzle(_state, 2, "DFS") {}
 	void run() {
         dfs(arr2num(state), zeroIndex(state), 0);
 	}
