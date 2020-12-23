@@ -13,15 +13,16 @@ private:
             while (n--) {
                 count++;
                 int now = q.front();
-                
+                q.pop();
+                if (visited.count(now)) continue;
+                visited.insert(now);
                 std::vector<int> arr = num2arr(now);
-                draw(arr, true);
+                //draw(arr, true);
 
                 if (now == ANSNUM) {
                     solved = true;
                     return true;
                 }
-                q.pop();
                 int idx = zeroIndex(arr);
                 for (int i = 0; i < 4; ++i) {
                     if (idx % 3 == 0 && i == 1) continue;
@@ -30,8 +31,10 @@ private:
                     if (next_idx >= 0 && next_idx < 9) {
                         std::swap(arr[idx], arr[next_idx]);
                         int tmp = arr2num(arr);
-                        parent[tmp] = now;
-                        q.push(tmp);
+                        if (!visited.count(tmp)) {
+                            parent[tmp] = now;
+                            q.push(tmp);
+                        }
                         std::swap(arr[idx], arr[next_idx]);
                     }
                 }

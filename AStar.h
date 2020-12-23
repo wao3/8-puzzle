@@ -52,7 +52,7 @@ private:
             visited.insert(now.num); //记录已访问状态
             std::vector<int> arr = num2arr(now.num);
 
-            draw(arr, true);
+            //draw(arr, true);
 
             //当前是正确解答，则返回结果
             if (now.num == ANSNUM) {

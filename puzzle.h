@@ -61,6 +61,7 @@ protected:
 	std::unordered_map<int, int> parent; //每个状态的父亲
 	std::unordered_set<int> visited; //记录已访问过的状态
 	int count = 1; //搜索次数
+	int pathCount = 0; //解法步数
 	bool solved = false; //已解决
 	RECT rect; //当前算法的子窗口位置
 	RECT titleRect; //当前算法的标题位置
@@ -126,9 +127,13 @@ protected:
 
 	//完成搜索后的动作
 	void finishSearch() {
-		char buffer[20];
-		sprintf(buffer, "%s(搜%d次)", name, count);
+		if (pathCount == 0) pathCount = getPath().size();
+		char buffer[50];
+		sprintf(buffer, "%s,搜%d次,走%d步", name, count, pathCount);
+		drawtext(_T("               "), &bottomRect, wordPos);
+		settextstyle(30, 0, _T("Consolas"));
 		drawtext(cstr2L(buffer), &bottomRect, wordPos);
+		settextstyle(40, 0, _T("Consolas"));
 		if (solved) {
 			drawtext(_T("搜索完毕,找到解法"), &titleRect, wordPos);
 		}
@@ -141,15 +146,12 @@ protected:
 	void showPath() {
 		drawtext(_T("    开始演示解法    "), &titleRect, wordPos);
 		std::vector< std::vector<int> > paths = getPath();
+		pathCount = paths.size();
 		for (std::vector<int> path : paths) {
 			draw(path, false);
 			Sleep(1000);
 		}
 		drawtext(_T("    演示结束    "), &titleRect, wordPos);
-
-		char buffer[20];
-		sprintf(buffer, "%s(搜%d次)", name, count);
-		drawtext(cstr2L(buffer), &bottomRect, wordPos);
 	}
 public:
 	//构造函数，设置初始状态、子窗口位置、算法名称

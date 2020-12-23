@@ -10,7 +10,7 @@ private:
 
     bool dfs(int stateNum, int idx, int d_step) {
         std::vector<int> stateArr = num2arr(stateNum);
-        draw(stateArr, true);
+        //draw(stateArr, true);
 
         if (d_step >= MAX || visited.count(stateNum)) return false;
         visited.insert(stateNum);
@@ -27,9 +27,8 @@ private:
             if (next_idx >= 0 && next_idx < 9) {
                 std::swap(stateArr[idx], stateArr[next_idx]);
                 int tmp = arr2num(stateArr);
-                parent[tmp] = stateNum;
+                if(!visited.count(tmp))parent[tmp] = stateNum;
                 if (dfs(tmp, next_idx, d_step+1)) return true;
-                parent.erase(tmp);
                 std::swap(stateArr[idx], stateArr[next_idx]);
             }
         }
