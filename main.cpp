@@ -67,23 +67,32 @@ vector<int> num2arr(int num) {
     return res;
 }
 
-int manhattan[9][9] = {
-    {0,1,2,1,2,3,2,3,4},
-    {1,0,1,2,1,2,3,2,3},
-    {2,1,0,3,2,1,4,3,2},
-    {1,2,3,0,1,2,1,2,3},
-    {2,1,2,1,0,1,2,1,2},
-    {3,2,1,2,1,0,3,2,1},
-    {2,3,4,1,2,3,0,1,2},
-    {3,2,3,2,1,2,1,0,1},
-    {4,3,2,3,2,1,2,1,0}
+void outArr(vector<int> arr) {
+    for (int i = 0; i < 9; ++i) {
+        if (i % 3 == 0) cout << endl;
+        cout << arr[i] << ' ';
+    }
+    cout << endl << "-----" << endl;
+}
+
+int manhattan[10][10] = {
+    {-1,-1,-1,-1,-1,-1,-1,-1,-1},
+    {-1,0,1,2,1,2,3,2,3,4},
+    {-1,1,0,1,2,1,2,3,2,3},
+    {-1,2,1,0,3,2,1,4,3,2},
+    {-1,1,2,3,0,1,2,1,2,3},
+    {-1,2,1,2,1,0,1,2,1,2},
+    {-1,3,2,1,2,1,0,3,2,1},
+    {-1,2,3,4,1,2,3,0,1,2},
+    {-1,3,2,3,2,1,2,1,0,1},
+    {-1,4,3,2,3,2,1,2,1,0}
 };
 unordered_map<int, int> step;
 
 int AScore(vector<int> arr, int s) {
     int score = s;
     for (int i = 0; i < 9; ++i) {
-        score += manhattan[i][arr[i]];
+        score += manhattan[i+1][arr[i]];
     }
     return score;
 }
@@ -108,12 +117,14 @@ int AStar(int arr_) {
     q.push(arr_);
     while (q.size()) {
         int n = q.size();
-        cout << a++ << endl;
+        //cout << a++ << endl;
         while (n--) {
             int now = q.top();
             visited.insert(now);
+            cout << a++ << endl;
             //cout << now << endl;
-            if (now == 1234567890) return true;
+            //outArr(num2arr(now));
+            if (now == 123456780) return true;
             vector<int> arr = num2arr(now);
             q.pop();
             int idx = zeroIndex(arr);
@@ -124,7 +135,6 @@ int AStar(int arr_) {
                 if (next_idx >= 0 && next_idx < 9) {
                     swap(arr[idx], arr[next_idx]);
                     int tmp = arr2num(arr);
-                    
                     if (!visited.count(tmp)) {
                         Aparent[tmp] = now;
                         step[tmp] = step[now] + 1;
@@ -179,7 +189,7 @@ bool bfs(int arr_) {
         int n = q.size();
         while (n--) {
             int now = q.front();
-            if (now == 1234567890) return true;
+            if (now == 123456780) return true;
             vector<int> arr = num2arr(now);
             q.pop();
             int idx = zeroIndex(arr);
@@ -201,7 +211,7 @@ bool bfs(int arr_) {
 }
 
 int main() {
-    vector<int> start { 3,1,2,4,5,6,7,0,8 };
+    vector<int> start { 4,5,0,7,6,2,8,1,3 };
     vector<int> start2(start);
     vector<int> path;
     //int start_ = arr2num(start);
@@ -221,14 +231,14 @@ int main() {
 
 
 
-    cout << "--------bfs:" << path.size() << endl;
+    cout << "--------Astar:" << endl;
     bool solved2 = false;
     int start2_ = arr2num(start2);
     solved2 = AStar(start2_);
     int now = 123456780;
-    cout << now << endl;
+    outArr(num2arr(now));
     while (Aparent[now]) {
-        cout << Aparent[now] << endl;
+        outArr(num2arr(Aparent[now]));
         now = Aparent[now];
     }
     //cout << solved;
