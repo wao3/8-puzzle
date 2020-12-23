@@ -76,16 +76,16 @@ void outArr(vector<int> arr) {
 }
 
 int manhattan[10][10] = {
-    {-1,-1,-1,-1,-1,-1,-1,-1,-1},
-    {-1,0,1,2,1,2,3,2,3,4},
-    {-1,1,0,1,2,1,2,3,2,3},
-    {-1,2,1,0,3,2,1,4,3,2},
-    {-1,1,2,3,0,1,2,1,2,3},
-    {-1,2,1,2,1,0,1,2,1,2},
-    {-1,3,2,1,2,1,0,3,2,1},
-    {-1,2,3,4,1,2,3,0,1,2},
-    {-1,3,2,3,2,1,2,1,0,1},
-    {-1,4,3,2,3,2,1,2,1,0}
+    {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+    {-1, 0, 1, 2, 1, 2, 3, 2, 3, 4},
+    {-1, 1, 0, 1, 2, 1, 2, 3, 2, 3},
+    {-1, 2, 1, 0, 3, 2, 1, 4, 3, 2},
+    {-1, 1, 2, 3, 0, 1, 2, 1, 2, 3},
+    {-1, 2, 1, 2, 1, 0, 1, 2, 1, 2},
+    {-1, 3, 2, 1, 2, 1, 0, 3, 2, 1},
+    {-1, 2, 3, 4, 1, 2, 3, 0, 1, 2},
+    {-1, 3, 2, 3, 2, 1, 2, 1, 0, 1},
+    {-1, 4, 3, 2, 3, 2, 1, 2, 1, 0}
 };
 unordered_map<int, int> step;
 
@@ -211,7 +211,7 @@ bool bfs(int arr_) {
 }
 
 int main() {
-    vector<int> start { 4,5,0,7,6,2,8,1,3 };
+    vector<int> start { 1,2,3,4,5,6,0,7,8 };
     vector<int> start2(start);
     vector<int> path;
     //int start_ = arr2num(start);
@@ -229,19 +229,29 @@ int main() {
     //cout << "solved: " << solved << endl;
     //cout << "path count: " << path.size() << endl;
 
-
-
-    cout << "--------Astar:" << endl;
+    cout << "--------BFS:" << endl;
     bool solved2 = false;
     int start2_ = arr2num(start2);
-    solved2 = AStar(start2_);
+    solved2 = bfs(start2_);
     int now = 123456780;
     outArr(num2arr(now));
     while (Aparent[now]) {
         outArr(num2arr(Aparent[now]));
         now = Aparent[now];
     }
-    //cout << solved;
+
+
+    //cout << "--------Astar:" << endl;
+    //bool solved2 = false;
+    //int start2_ = arr2num(start2);
+    //solved2 = AStar(start2_);
+    //int now = 123456780;
+    //outArr(num2arr(now));
+    //while (Aparent[now]) {
+    //    outArr(num2arr(Aparent[now]));
+    //    now = Aparent[now];
+    //}
+
 
 	return 0;
 }

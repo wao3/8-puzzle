@@ -18,5 +18,22 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="puzzle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DFS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BFS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AStar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
