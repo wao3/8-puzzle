@@ -65,6 +65,18 @@ vector<int> num2arr(int num) {
     return res;
 }
 
+int AScore(vector<int> arr) {
+    int score = 0;
+    for (int i = 0; i < 9; ++i) {
+        if (arr[i] == answer[i]) score++;
+    }
+    return 0;
+}
+
+//int AStar() {
+//
+//}
+
 int dd[] = { 1, -1, 3, -3 };
 
 unordered_set<int> st;
@@ -72,12 +84,13 @@ unordered_set<int> st;
 int c = 1;
 bool dfs(int _arr, int idx, vector<int>& path) {
     vector<int> arr= num2arr(_arr);
-    if (!isSolvable(arr, answer) || st.count(arrHash(arr))) return false;
+    if (!isSolvable(arr, answer) || path.size() >= 50 || st.count(arrHash(arr))) return false;
     st.insert(arrHash(arr));
-    if (isSolve(arr)) {
+    if (_arr == 123456780) {
         return true;
     }
-    cout << c++ << endl;
+    c++;
+    //cout << c++ << endl;
     //cout << "!!!!!" << endl;
     for (int i = 0; i < 4; ++i) {
         if (idx % 3 == 0 && i == 1) continue;
@@ -108,7 +121,7 @@ bool dfs(int _arr, int idx, vector<int>& path) {
 //}
 
 int main() {
-    vector<int> start { 3,6,5,2,0,7,1,4,8 };
+    vector<int> start { 0,8,4,2,7,3,1,5,6 };
     vector<int> path;
     int start_ = arr2num(start);
     path.push_back(start_);
@@ -121,8 +134,9 @@ int main() {
         }
         cout << "\n------>\n";
     }
+    cout << "search count:" << c << endl;
     cout << "solved: " << solved << endl;
-    cout << "count: " << path.size() << endl;
+    cout << "path count: " << path.size() << endl;
     //cout << solved;
 
 	return 0;
